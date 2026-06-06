@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
-import { Session } from "express-session";
+import * as jwt from "jsonwebtoken";
 import { prisma } from '../lib/db';
 import bcrypt from 'bcrypt';
-
 
 // -- Register -- 
 export const register = async (req: Request, res:Response) => {
@@ -56,13 +55,24 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({error: 'Password Salah'})
     }
 
+    const payload = { 
+      name: user.name, 
+      id: user.id 
+    };
+    const secret = process.env.JWT_SECRET
+    
+    if (!secret) {
+    throw new Error("JWT_SECRET tidak ditemukan");
+  }
+
+
+    const token = jwt.sign(payload, secret, {expiresIn: '1h'} )
+
     return res.status(200).json({
-      message: "Login sukses",
-      user: {
-        id: user.id,
-        name: user.name,
-      },
+      message: "Login Sukses",
+      token
     });
+
     
 
   }
