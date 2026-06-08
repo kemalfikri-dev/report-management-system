@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction, response } from "express";
 import * as jwt from "jsonwebtoken"
-import { UserPayload } from "@/types/session";
+import { UserPayload } from "@/types/express";
 
 
 
@@ -18,12 +18,12 @@ export const verifyToken = (
   }
 
   if(!token){
-    return res.status(401).json({message: 'Access Denied: Token tidak valid'})
+    return res.status(401).json({message: 'Access Denied: Token tidak ditemukan'})
   }
   try {
     const verifyPayload = jwt.verify(token, secret) as UserPayload ;
 
-    req.user =verifyPayload;
+    req.user = verifyPayload;
 
     next();
   }
