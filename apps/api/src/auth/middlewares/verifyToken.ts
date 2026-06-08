@@ -13,15 +13,15 @@ export const verifyToken = (
   const token = authHeader && authHeader.split(' ')[1];
   const secret = process.env.JWT_SECRET
     
-    if (!secret) {
-    throw new Error("JWT_SECRET tidak ditemukan");
+  if (!secret) {
+    return res.status(500).json({ message: "Server configuration error" });
   }
 
   if(!token){
     return res.status(401).json({message: 'Access Denied: Token tidak valid'})
   }
   try {
-    const verifyPayload = jwt.verify(token, secret) as unknown as UserPayload ;
+    const verifyPayload = jwt.verify(token, secret) as UserPayload ;
 
     req.user =verifyPayload;
 
