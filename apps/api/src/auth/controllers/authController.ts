@@ -8,7 +8,7 @@ export const register = async (req: Request, res:Response) => {
   try {
     const { name, email, password } = req.body;
 
-    const existing = await prisma.users.findUnique({
+    const existing = await prisma.user.findUnique({
         where: { email },
       });
 
@@ -18,7 +18,7 @@ export const register = async (req: Request, res:Response) => {
 
     const hashedPassword = await bcrypt.hash(password,10);
 
-    await prisma.users.create({
+    await prisma.user.create({
       data: {
         name,
         email, 
@@ -41,7 +41,7 @@ export const login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
 
-    const user = await prisma.users.findUnique({
+    const user = await prisma.user.findUnique({
       where: {email},
     });
 

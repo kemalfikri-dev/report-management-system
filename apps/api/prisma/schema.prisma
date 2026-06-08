@@ -1,13 +1,25 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/client"
+}
+
+enum Category {
+  BUG
+  FEATURE
+  COMPLAINT
+  MAINTENANCE
+}
+
+enum Status {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 datasource db {
   provider = "postgresql"
 }
 
-model users {
+model User {
   id        String   @id @default(cuid())
   email     String   @unique
   name      String
@@ -20,14 +32,16 @@ model users {
   reports   Report[]
 }
 
-model reports {
+model Report {
   id        String   @id@default(cuid())
   title     String
   description String 
-  status    String 
+  status    Status   @default(PENDING)
+  category  Category 
+  
 
   userId    String
-  user      users @relation(fields: [userId], references: [id])
+  user      User @relation(fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
