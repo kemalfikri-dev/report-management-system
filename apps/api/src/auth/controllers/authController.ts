@@ -62,7 +62,7 @@ export const login = async (req: Request, res: Response) => {
     const secret = process.env.JWT_SECRET
     
     if(!secret){
-    return res.status(401).json({message: 'Access Denied: Token tidak valid'})
+    return res.status(500).json({message: 'Server configuration error'})
   }
 
 
