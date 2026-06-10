@@ -46,13 +46,13 @@ export const login = async (req: Request, res: Response) => {
     });
 
     if(!user){
-      return res.status(404).json({error: 'Email tidak ditemukan'})
+      return res.status(401).json({error: 'Email atau Password Salah'})
     }
 
     const match = await bcrypt.compare(password, user.password);
 
     if (!match) {
-      return res.status(401).json({error: 'Password Salah'})
+      return res.status(401).json({error: 'Email atau Password Salah'})
     }
 
     const payload = { 
