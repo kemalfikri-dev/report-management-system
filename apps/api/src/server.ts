@@ -1,15 +1,24 @@
+import cors from 'cors'
 import dotenv from 'dotenv'
 dotenv.config();
 
 import express, { Request, Response } from 'express';
-import authRoutes from './routes/authRoutes'
+import authRoutes from './Auth/routes/authRoute';
+import dashboardRoute from './Dashboard/routes/dashboardRoute'
+import reportRoute from './Report/routes/reportRoute'
 
 const app = express();
 const PORT = process.env.PORT || 3000
 
+app.use(cors({
+  origin: process.env.CLIENT_URL,
+})
+);
 app.use(express.json());
 
 app.use('/api', authRoutes)
+app.use('/api', dashboardRoute)
+app.use('/api', reportRoute)
 
 app.get('/', (req: Request, res: Response) => {
   res.status(200).json({
