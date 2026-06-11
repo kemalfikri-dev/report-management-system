@@ -1,21 +1,26 @@
-import express from 'express';
-import { createReport, reportById, showReport } from '../controllers/reportController';
+import express from "express";
+import {
+  createReport,
+  deleteReport,
+  reportById,
+  showReport,
+  updateReport,
+} from "../controllers/reportController";
 import { verifyToken } from "../../Auth/middlewares/verifyToken";
 
 const router = express.Router();
 
 //-- Create Report --
-router.post('/reports', verifyToken, createReport);
+router.post("/reports/create", verifyToken, createReport);
 
 //-- Show Report --
-router.get('/reports/my', verifyToken, showReport);
-router.get('/reports/my/:id', verifyToken, reportById);
+router.get("/reports", verifyToken, showReport);
+router.get("/reports/my/:id", verifyToken, reportById);
 
-router.get('/profile', verifyToken, (req, res) => {
-  res.json({
-    user: req.user
-  });
-});
+//-- Update Report --
+router.post("/reports/update", verifyToken, updateReport);
 
+//-- Delete Report --
+router.post("/reports/delete", verifyToken, deleteReport);
 
 export default router;
