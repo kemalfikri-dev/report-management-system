@@ -64,7 +64,7 @@ export const showReport = async (req: Request, res: Response) => {
     });
 
     if (myReports.length === 0) {
-      return res.status(200).json({ message: "Laporan Kosong!" });
+      return res.status(200).json(myReports);
     }
 
     return res.status(200).json(myReports);
