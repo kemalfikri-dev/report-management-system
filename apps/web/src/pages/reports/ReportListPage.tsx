@@ -1,86 +1,19 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import dayjs from "dayjs";
+import { DialogReport } from "./DialogReport";
+import { Plus } from "lucide-react";
 
-const dummyReports = [
-  {
-    id: 1,
-    title: "Printer Rusak",
-    description:
-      "Printer di lantai 3 tidak dapat digunakan karena selalu menampilkan pesan error saat mencetak dokumen.",
-    category: "BUG",
-    status: "PENDING",
-    createdAt: "11 Jun 2026",
-  },
-  {
-    id: 2,
-    title: "Dark Mode",
-    description:
-      "Menambahkan fitur dark mode pada aplikasi untuk meningkatkan kenyamanan pengguna saat bekerja di malam hari.",
-    category: "FEATURE",
-    status: "APPROVED",
-    createdAt: "10 Jun 2026",
-  },
-  {
-    id: 3,
-    title: "Internet Lambat",
-    description:
-      "Koneksi internet di ruang operasional sering mengalami penurunan kecepatan sehingga menghambat pekerjaan tim.",
-    category: "COMPLAINT",
-    status: "REJECTED",
-    createdAt: "09 Jun 2026",
-  },
-  {
-    id: 4,
-    title: "AC Ruang Server",
-    description:
-      "AC pada ruang server perlu dilakukan pengecekan dan perawatan berkala karena suhu ruangan mulai meningkat.",
-    category: "MAINTENANCE",
-    status: "PENDING",
-    createdAt: "08 Jun 2026",
-  },
-];
-
-function DialogReport({ selectedReport }) {
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline">View</Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>{selectedReport.title}</DialogTitle>
-          <div>
-            <Badge variant={"secondary"}>{selectedReport.category}</Badge>
-            <Badge>{selectedReport.status}</Badge>
-          </div>
-          <DialogDescription>{selectedReport.description}</DialogDescription>
-        </DialogHeader>
-        <DialogFooter className="sm:justify-start">
-          <p className="text-sm text-muted-foreground">
-            {selectedReport.createdAt}
-          </p>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-export function ReportListPage() {
+export function ReportListPage({ reports }: ReportListProps) {
   return (
     <div className="mx-auto max-w-3xl p-4 space-y-6">
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold">My Reports</h2>
-          <Button>Create Report</Button>
+          <Button>
+            <Plus className="mr-2 h-4 w-4" />
+            Create Report
+          </Button>
         </div>
 
         <input
@@ -90,28 +23,41 @@ export function ReportListPage() {
         />
       </div>
 
-      <div className="space-y-4">
-        {dummyReports.map((report) => (
-          <div
-            key={report.id}
-            className="border rounded-lg p-4 space-y-3 bg-card shadow-sm"
-          >
-            <h3 className="font-semibold text-lg">{report.title}</h3>
+      {reports.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 px-4 border-2 border-dashed rounded-xl bg-card/50 mt-4 text-center">
+          <h3 className="text-xl font-semibold mb-2">No reports found</h3>
+          <p className="text-muted-foreground max-w-md mb-8">
+            You don't have any reports yet.
+          </p>
+          <Button size="lg">
+            <Plus className="mr-2 h-5 w-5" />
+            Create Report
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {reports.map((report) => (
+            <div
+              key={report.id}
+              className="border rounded-lg p-4 space-y-3 bg-card shadow-sm"
+            >
+              <h3 className="font-semibold text-lg">{report.title}</h3>
 
-            <div className="flex gap-2">
-              <Badge variant="secondary">{report.category}</Badge>
-              <Badge variant="default">{report.status}</Badge>
-            </div>
+              <div className="flex gap-2">
+                <Badge variant="secondary">{report.category}</Badge>
+                <Badge variant="default">{report.status}</Badge>
+              </div>
 
-            <div className="flex justify-between items-center pt-2">
-              <p className="text-sm text-muted-foreground">
-                {report.createdAt}
-              </p>
-              <DialogReport selectedReport={report} />
+              <div className="flex justify-between items-center pt-2">
+                <p className="text-sm text-muted-foreground">
+                  {dayjs(report.createdAt).format("DD MMMM YYYY, HH:mm")}
+                </p>
+                <DialogReport selectedReport={report} />
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -5,7 +5,7 @@ import { RegisterPage } from "./pages/auth/RegisterPage";
 import { Toaster } from "sonner";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
 import { AutoRoute } from "./routes/AutoRoute";
-import { ReportListPage } from "./pages/reports/ReportListPage";
+import { ShowReport } from "./pages/reports/ShowReport";
 
 function App() {
   return (
@@ -13,7 +13,7 @@ function App() {
       <Routes>
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<DashboardPage />}></Route>
-          <Route path="/reports" element={<ReportListPage />}></Route>
+          <Route path="/reports" element={<ShowReport />}></Route>
         </Route>
         <Route element={<AutoRoute />}>
           <Route path="/login" element={<LoginPage />}></Route>
