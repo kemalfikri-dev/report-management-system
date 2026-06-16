@@ -16,7 +16,7 @@ export function useReport() {
       .then((res) => {
         if (!cancelled) {
           setIsError(false);
-          setReports(res.data);
+          setReports(Array.isArray(res.data) ? res.data : []);
         }
       })
       .catch((err) => {
