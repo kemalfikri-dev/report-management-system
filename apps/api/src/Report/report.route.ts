@@ -18,9 +18,9 @@ router.get("/reports", verifyToken, showReport);
 router.get("/reports/my/:id", verifyToken, reportById);
 
 //-- Update Report --
-router.post("/reports/update", verifyToken, updateReport);
+router.post("/reports/update/:id", verifyToken, updateReport);
 
 //-- Delete Report --
-router.post("/reports/delete", verifyToken, deleteReport);
+router.post("/reports/delete/:id", verifyToken, deleteReport);
 
 export default router;
