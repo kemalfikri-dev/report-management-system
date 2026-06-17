@@ -25,3 +25,8 @@ interface EditReportProps {
   refetch: () => void;
   selectedReport: Report;
 }
+
+interface DeleteReportProps {
+  refetch: () => void;
+  selectedReport: Report;
+}
