@@ -16,7 +16,9 @@ export function DialogReport({ selectedReport }: { selectedReport: Report }) {
     <>
       <Dialog>
         <DialogTrigger asChild>
-          <Button variant="outline">View</Button>
+          <Button variant="outline" size="sm" className="gap-2">
+            View
+          </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>

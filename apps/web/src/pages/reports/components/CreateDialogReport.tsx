@@ -37,7 +37,7 @@ export function CreateDialogReport({ refetch }: CreateReportProps) {
     event.preventDefault();
     setIsLoading(true);
     try {
-      const res = await apiClient.post("/reports/create", {
+      const res = await apiClient.post("/reports", {
         title,
         category,
         description,
@@ -118,13 +118,16 @@ export function CreateDialogReport({ refetch }: CreateReportProps) {
                   value={description}
                   placeholder="Type your message here."
                   onChange={(event) => setDescription(event.target.value)}
+                  required
                 />
               </Field>
             </FieldGroup>
           </div>
           <DialogFooter className="sm:justify-end pt-4">
             <DialogClose asChild>
-              <Button type="button" variant="outline">Cancel</Button>
+              <Button type="button" variant="outline">
+                Cancel
+              </Button>
             </DialogClose>
             <Button disabled={isLoading} type="submit">
               {isLoading ? "Submitting..." : "Submit"}

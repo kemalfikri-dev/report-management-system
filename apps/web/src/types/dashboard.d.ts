@@ -20,3 +20,8 @@ interface ReportListProps {
 interface CreateReportProps {
   refetch: () => void;
 }
+
+interface EditReportProps {
+  refetch: () => void;
+  selectedReport: Report;
+}
