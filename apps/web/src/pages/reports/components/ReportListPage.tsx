@@ -5,6 +5,7 @@ import { DialogReport } from "./DialogReport";
 import { Plus } from "lucide-react";
 import { CreateDialogReport } from "./CreateDialogReport";
 import { EditDialogReport } from "./EditDialogReport";
+import { DeleteReport } from "./DeleteReport";
 
 export function ReportListPage({ reports, refetch }: ReportListProps) {
   return (
@@ -58,6 +59,7 @@ export function ReportListPage({ reports, refetch }: ReportListProps) {
                     selectedReport={report}
                   />
                   <DialogReport selectedReport={report} />
+                  <DeleteReport refetch={refetch} selectedReport={report} />
                 </div>
               </div>
             </div>
