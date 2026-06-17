@@ -1,29 +1,30 @@
-import cors from 'cors'
-import dotenv from 'dotenv'
+import cors from "cors";
+import dotenv from "dotenv";
 dotenv.config();
 
-import express, { Request, Response } from 'express';
-import authRoutes from './Auth/routes/authRoute';
-import dashboardRoute from './Dashboard/routes/dashboardRoute'
-import reportRoute from './Report/routes/reportRoute'
+import express, { Request, Response } from "express";
+import authRoutes from "./auth/auth.route";
+import dashboardRoute from "./dashboard/dashboard.route";
+import reportRoute from "./report/report.route";
 
 const app = express();
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 3000;
 
-app.use(cors({
-  origin: process.env.CLIENT_URL,
-})
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+  }),
 );
 app.use(express.json());
 
-app.use('/api', authRoutes)
-app.use('/api', dashboardRoute)
-app.use('/api', reportRoute)
+app.use("/api", authRoutes);
+app.use("/api", dashboardRoute);
+app.use("/api", reportRoute);
 
-app.get('/', (req: Request, res: Response) => {
+app.get("/", (req: Request, res: Response) => {
   res.status(200).json({
     message: "Backend server is running smoothly!",
-    status: "OK"
+    status: "OK",
   });
 });
 

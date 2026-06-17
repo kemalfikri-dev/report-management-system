@@ -5,8 +5,8 @@ import {
   reportById,
   showReport,
   updateReport,
-} from "../controllers/reportController";
-import { verifyToken } from "../../Auth/middlewares/verifyToken";
+} from "./report.controller";
+import { verifyToken } from "../auth/auth.middleware";
 
 const router = express.Router();
 
