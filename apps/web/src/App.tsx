@@ -12,7 +12,7 @@ function App() {
     <>
       <Routes>
         <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<DashboardPage />}></Route>
+          <Route path="/" element={<DashboardPage />}></Route>
           <Route path="/reports" element={<ShowReport />}></Route>
         </Route>
         <Route element={<AutoRoute />}>

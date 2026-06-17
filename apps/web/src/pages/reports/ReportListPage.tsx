@@ -3,17 +3,15 @@ import { Badge } from "@/components/ui/badge";
 import dayjs from "dayjs";
 import { DialogReport } from "./DialogReport";
 import { Plus } from "lucide-react";
+import { CreateDialogReport } from "./CreateDialogReport";
 
-export function ReportListPage({ reports }: ReportListProps) {
+export function ReportListPage({ reports, refetch }: ReportListProps) {
   return (
     <div className="mx-auto max-w-3xl p-4 space-y-6">
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold">My Reports</h2>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Create Report
-          </Button>
+          <CreateDialogReport refetch={refetch} />
         </div>
 
         <input

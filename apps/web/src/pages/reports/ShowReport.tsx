@@ -12,7 +12,7 @@ export function ShowReport() {
       ) : isError ? (
         <ReportErrorPage onRetry={refetch} isLoading={isLoading} />
       ) : (
-        <ReportListPage reports={reports} />
+        <ReportListPage refetch={refetch} reports={reports} />
       )}
     </div>
   );

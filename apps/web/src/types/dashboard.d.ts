@@ -14,4 +14,9 @@ interface ReportErrorProps {
 
 interface ReportListProps {
   reports: Report[];
+  refetch: () => void;
+}
+
+interface CreateReportProps {
+  refetch: () => void;
 }
