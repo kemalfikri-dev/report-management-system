@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import { DialogReport } from "./DialogReport";
 import { Plus } from "lucide-react";
 import { CreateDialogReport } from "./CreateDialogReport";
+import { EditDialogReport } from "./EditDialogReport";
 
 export function ReportListPage({ reports, refetch }: ReportListProps) {
   return (
@@ -50,7 +51,14 @@ export function ReportListPage({ reports, refetch }: ReportListProps) {
                 <p className="text-sm text-muted-foreground">
                   {dayjs(report.createdAt).format("DD MMMM YYYY, HH:mm")}
                 </p>
-                <DialogReport selectedReport={report} />
+                <div className="flex gap-2">
+                  <EditDialogReport
+                    key={report?.id || "new"}
+                    refetch={refetch}
+                    selectedReport={report}
+                  />
+                  <DialogReport selectedReport={report} />
+                </div>
               </div>
             </div>
           ))}
