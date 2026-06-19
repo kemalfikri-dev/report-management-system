@@ -82,7 +82,7 @@ export function ReportListPage({ reports, refetch }: ReportListProps) {
           onChange={(event) => setSearchFilter(event.target.value)}
         />
 
-        {reports.length >= 0 ? (
+        {reports.length > 0 ? (
           <p className="text-sm text-muted-foreground">
             {filteredReports.length} reports found
           </p>
@@ -120,7 +120,7 @@ export function ReportListPage({ reports, refetch }: ReportListProps) {
               key={report.id}
               className="border rounded-lg p-4 space-y-3 bg-card shadow-sm"
             >
-              <h3 className="font-semibold text-lg">{report.title}</h3>
+              <h3 className="font-semibold text-lg truncate">{report.title}</h3>
 
               <div className="flex gap-2">
                 <Badge variant="secondary">{report.category}</Badge>

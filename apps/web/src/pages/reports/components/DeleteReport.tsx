@@ -59,7 +59,10 @@ export function DeleteReport({ refetch, selectedReport }: DeleteReportProps) {
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             disabled={isLoading}
-            onClick={handleDelete}
+            onClick={(e) => {
+              e.preventDefault();
+              handleDelete();
+            }}
             className="bg-red-500 text-white hover:bg-red-600"
           >
             {isLoading ? "Deleting..." : "Delete"}

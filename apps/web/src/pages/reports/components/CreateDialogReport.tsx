@@ -36,6 +36,7 @@ export function CreateDialogReport({ refetch }: CreateReportProps) {
   async function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsLoading(true);
+
     try {
       const res = await apiClient.post("/reports", {
         title,
@@ -64,6 +65,7 @@ export function CreateDialogReport({ refetch }: CreateReportProps) {
       setIsLoading(false);
     }
   }
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -72,7 +74,12 @@ export function CreateDialogReport({ refetch }: CreateReportProps) {
           Create Report
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent
+        className="sm:max-w-md"
+        onInteractOutside={(e) => {
+          if (isLoading) e.preventDefault();
+        }}
+      >
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Create Report</DialogTitle>
@@ -125,7 +132,7 @@ export function CreateDialogReport({ refetch }: CreateReportProps) {
           </div>
           <DialogFooter className="sm:justify-end pt-4">
             <DialogClose asChild>
-              <Button type="button" variant="outline">
+              <Button type="button" variant="outline" disabled={isLoading}>
                 Cancel
               </Button>
             </DialogClose>

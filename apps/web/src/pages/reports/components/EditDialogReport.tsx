@@ -67,7 +67,12 @@ export function EditDialogReport({ refetch, selectedReport }: EditReportProps) {
           Edit
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent
+        className="sm:max-w-md"
+        onInteractOutside={(e) => {
+          if (isLoading) e.preventDefault();
+        }}
+      >
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Edit Report</DialogTitle>
@@ -91,7 +96,7 @@ export function EditDialogReport({ refetch, selectedReport }: EditReportProps) {
                 <FieldLabel htmlFor="checkout-category-ts6">
                   Category
                 </FieldLabel>
-                <Select value={category} onValueChange={setCategory}>
+                <Select value={category} onValueChange={setCategory} required>
                   <SelectTrigger id="checkout-category-ts6">
                     <SelectValue placeholder="Select Category" />
                   </SelectTrigger>
@@ -120,7 +125,7 @@ export function EditDialogReport({ refetch, selectedReport }: EditReportProps) {
           </div>
           <DialogFooter className="sm:justify-end pt-4">
             <DialogClose asChild>
-              <Button type="button" variant="outline">
+              <Button type="button" variant="outline" disabled={isLoading}>
                 Cancel
               </Button>
             </DialogClose>
