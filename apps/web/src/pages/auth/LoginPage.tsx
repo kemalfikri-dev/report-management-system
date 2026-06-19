@@ -33,7 +33,7 @@ export function LoginPage() {
         toast.success("Login Berhasil!");
         clearInput();
         localStorage.setItem("authToken", res.data.token);
-        navigate("/dashboard");
+        navigate("/");
       }
     } catch (err) {
       if (isAxiosError<ApiErrorResponse>(err)) {

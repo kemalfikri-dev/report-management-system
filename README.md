@@ -66,7 +66,7 @@ report-management-system/
 │           │   └── DashboardPage.tsx
 │           ├── routes/
 │           │   ├── ProtectedRoute.tsx  # Redirect to /login if no token
-│           │   └── AutoRoute.tsx       # Redirect to /dashboard if logged in
+│           │   └── AutoRoute.tsx       # Redirect to / if logged in
 │           ├── lib/
 │           │   └── axios.ts            # Axios instance with base URL
 │           ├── types/
@@ -88,7 +88,7 @@ User → Register (/api/register)
 
 ### Route Guards
 - **`ProtectedRoute`** — Redirects to `/login` if user is not authenticated
-- **`AutoRoute`** — Redirects to `/dashboard` if user is already logged in
+- **`AutoRoute`** — Redirects to `/` if user is already logged in
 
 ---
 
@@ -210,7 +210,7 @@ curl -X POST http://localhost:3000/api/login \
   -d '{"email":"john@example.com","password":"Password123!"}'
 
 # Access protected route (use token from login response)
-curl http://localhost:3000/api/dashboard \
+curl http://localhost:3000/api/ \
   -H "Authorization: Bearer <YOUR_TOKEN>"
 ```
 

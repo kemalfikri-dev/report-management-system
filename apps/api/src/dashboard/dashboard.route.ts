@@ -1,6 +1,6 @@
 import express from 'express';
-import { dashboard } from '../controllers/dashboardController';
-import { verifyToken } from "../../Auth/middlewares/verifyToken";
+import { dashboard } from './dashboard.controller';
+import { verifyToken } from "../auth/auth.middleware";
 
 const router = express.Router();
 
