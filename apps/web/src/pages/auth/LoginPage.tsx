@@ -32,7 +32,6 @@ export function LoginPage() {
       if (res.status === 200) {
         toast.success("Login Berhasil!");
         clearInput();
-        localStorage.setItem("authToken", res.data.token);
         navigate("/");
       }
     } catch (err) {
