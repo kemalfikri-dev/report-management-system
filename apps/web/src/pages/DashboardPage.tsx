@@ -5,17 +5,27 @@ import { useState } from "react";
 import { toast } from "sonner";
 import apiClient, { isAxiosError } from "@/lib/axios";
 import type { ApiErrorResponse } from "@/types/auth";
+import { useContext } from "react";
+import { AuthContext } from "@/context/AuthContext";
 
 export function DashboardPage() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const auth = useContext(AuthContext);
+
+  if (!auth) {
+    throw new Error("AuthContext not found");
+  }
+
+  const { checkUser } = auth;
 
   async function handleLogout() {
     setIsLoading(true);
     try {
       const res = await apiClient.post("/logout");
-      if (res.status === 200) {
+      if (res.status === 201) {
         toast.success("Logout Berhasil!");
+        checkUser();
         navigate("/login");
       }
     } catch (err) {
@@ -28,8 +38,9 @@ export function DashboardPage() {
           toast.error("Terjadi kesalahan yang tidak diketahui");
         }
       }
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }
   return (
     <>
