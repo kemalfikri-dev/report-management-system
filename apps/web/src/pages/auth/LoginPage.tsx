@@ -9,17 +9,25 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import apiClient, { isAxiosError } from "@/lib/axios";
 import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
 import type { ApiErrorResponse } from "@/types/auth";
+import { AuthContext } from "@/context/AuthContext";
 
 export function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const auth = useContext(AuthContext);
+
+  if (!auth) {
+    throw new Error("AuthContext not found");
+  }
+
+  const { checkUser } = auth;
 
   async function handleLogin(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -31,7 +39,7 @@ export function LoginPage() {
       });
       if (res.status === 200) {
         toast.success("Login Berhasil!");
-        clearInput();
+        await checkUser();
         navigate("/");
       }
     } catch (err) {
@@ -46,11 +54,6 @@ export function LoginPage() {
       }
     }
     setIsLoading(false);
-  }
-
-  function clearInput() {
-    setEmail("");
-    setPassword("");
   }
 
   return (

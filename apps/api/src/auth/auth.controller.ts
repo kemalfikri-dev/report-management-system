@@ -90,3 +90,17 @@ export const logout = (req: Request, res: Response) => {
     res.status(500).json({ error: "Terjadi kesalahan, coba lagi" });
   }
 };
+
+// -- Get Me --
+export const getMe = (req: Request, res: Response) => {
+  try {
+    const userData = req.user;
+
+    res.status(200).json({ message: "Login success", userData });
+  } catch (err) {
+    console.log(err);
+    res
+      .status(404)
+      .json({ error: "data User tidak ditemukan, silahkan login kembali" });
+  }
+};
