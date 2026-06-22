@@ -7,6 +7,12 @@ interface Report {
   createdAt: string;
 }
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
 interface ReportErrorProps {
   onRetry: () => void;
   isLoading: boolean;
@@ -29,4 +35,10 @@ interface EditReportProps {
 interface DeleteReportProps {
   refetch: () => void;
   selectedReport: Report;
+}
+
+interface UserProps {
+  user: User | null;
+  isLoading: boolean;
+  checkUser: () => Promise<void>;
 }

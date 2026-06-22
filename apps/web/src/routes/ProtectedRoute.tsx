@@ -1,7 +1,17 @@
+import { AuthContext } from "@/context/AuthContext";
+import { useContext } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 
 export function ProtectedRoute() {
-  const token = localStorage.getItem("authToken");
+  const { user, isLoading } = useContext(AuthContext) as UserProps;
 
-  return token ? <Outlet /> : <Navigate to="/login" replace />;
+  if (isLoading === true) {
+    return <div>Loading...</div>;
+  }
+
+  if (user === null) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <Outlet />;
 }
