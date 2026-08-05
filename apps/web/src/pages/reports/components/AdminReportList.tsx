@@ -11,31 +11,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus } from "lucide-react";
 import { EditDialogReport } from "./EditDialogReport";
 import { ApproveButton } from "./ApproveButton";
 import { RejectDialog } from "./RejectDialog";
-import { useState } from "react";
+import { useState, Fragment, useEffect } from "react";
 import { useAdminReport } from "../hooks/useAdminReport";
 
 export function AdminReportList() {
-  const { allReports, adminRefetch } = useAdminReport();
+  const [page, setPage] = useState(1);
   const [searchFilter, setSearchFilter] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("ALL");
   const [statusFilter, setStatusFilter] = useState("ALL");
 
-  const filteredReports = allReports.filter((report) => {
-    const matchSearch =
-      report.title.toLowerCase().includes(searchFilter.toLowerCase()) ||
-      report.description.toLowerCase().includes(searchFilter.toLowerCase());
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchFilter), 500);
+    return () => clearTimeout(timer);
+  }, [searchFilter]);
 
-    const matchCategory =
-      categoryFilter === "ALL" ? true : report.category === categoryFilter;
-
-    const matchStatus =
-      statusFilter === "ALL" ? true : report.status === statusFilter;
-
-    return matchSearch && matchCategory && matchStatus;
+  const { allReports, meta, adminRefetch, isLoading } = useAdminReport({
+    page,
+    limit: 10,
+    search: debouncedSearch,
+    category: categoryFilter,
+    status: statusFilter,
   });
 
   return (
@@ -46,7 +45,13 @@ export function AdminReportList() {
         </div>
 
         <div className="flex gap-2 items-center">
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+          <Select
+            value={categoryFilter}
+            onValueChange={(val) => {
+              setCategoryFilter(val);
+              setPage(1);
+            }}
+          >
             <SelectTrigger id="checkout-category-ts6">
               <SelectValue placeholder="Select Category" />
             </SelectTrigger>
@@ -61,7 +66,13 @@ export function AdminReportList() {
             </SelectContent>
           </Select>
 
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <Select
+            value={statusFilter}
+            onValueChange={(val) => {
+              setStatusFilter(val);
+              setPage(1);
+            }}
+          >
             <SelectTrigger id="checkout-category-ts7">
               <SelectValue placeholder="Select Category" />
             </SelectTrigger>
@@ -80,43 +91,31 @@ export function AdminReportList() {
           placeholder="Search Reports..."
           className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
           value={searchFilter}
-          onChange={(event) => setSearchFilter(event.target.value)}
+          onChange={(event) => {
+            setSearchFilter(event.target.value);
+            setPage(1);
+          }}
         />
 
-        {allReports.length > 0 ? (
+        {meta ? (
           <p className="text-sm text-muted-foreground">
-            {filteredReports.length} reports found
+            {meta.total} reports found (Page {meta.page} of {meta.totalPages || 1})
           </p>
         ) : null}
       </div>
 
-      {filteredReports.length === 0 ? (
+      {isLoading ? (
+        <div className="flex justify-center p-8">Loading reports...</div>
+      ) : allReports.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 px-4 border-2 border-dashed rounded-xl bg-card/50 mt-4 text-center">
-          {allReports.length > 0 && filteredReports.length === 0 ? (
-            <>
-              <h3 className="text-xl font-semibold mb-2">
-                No reports matched found
-              </h3>
-              <p className="text-muted-foreground max-w-md mb-8">
-                No reports match your current filters
-              </p>
-            </>
-          ) : (
-            <>
-              <h3 className="text-xl font-semibold mb-2">No reports found</h3>
-              <p className="text-muted-foreground max-w-md mb-8">
-                You don't have any reports yet.
-              </p>
-              <Button size="lg">
-                <Plus className="mr-2 h-5 w-5" />
-                Create Report
-              </Button>
-            </>
-          )}
+          <h3 className="text-xl font-semibold mb-2">No reports found</h3>
+          <p className="text-muted-foreground max-w-md mb-8">
+            No reports match your current filters.
+          </p>
         </div>
       ) : (
         <div className="space-y-4">
-          {filteredReports.map((report) => (
+          {allReports.map((report) => (
             <div
               key={report.id}
               className="border rounded-lg p-4 space-y-3 bg-card shadow-sm"
@@ -139,7 +138,7 @@ export function AdminReportList() {
                   />
                   <DialogReport selectedReport={report} />
                   {report.status === "PENDING" && (
-                    <>
+                    <Fragment>
                       <ApproveButton
                         selectedReport={report}
                         refetch={adminRefetch}
@@ -148,12 +147,35 @@ export function AdminReportList() {
                         selectedReport={report}
                         refetch={adminRefetch}
                       />
-                    </>
+                    </Fragment>
                   )}
                 </div>
               </div>
             </div>
           ))}
+
+          {/* Pagination Controls */}
+          {meta && meta.totalPages > 1 && (
+            <div className="flex justify-center gap-4 items-center pt-4">
+              <Button
+                variant="outline"
+                disabled={page === 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+              >
+                Previous
+              </Button>
+              <span className="text-sm font-medium">
+                Page {page} of {meta.totalPages}
+              </span>
+              <Button
+                variant="outline"
+                disabled={page >= meta.totalPages}
+                onClick={() => setPage((p) => p + 1)}
+              >
+                Next
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>
