@@ -56,7 +56,7 @@ export function ReportFilters({
       </div>
       <div className="flex gap-2 w-full sm:w-auto">
         <Select value={categoryFilter} onValueChange={handleCategoryChange}>
-          <SelectTrigger className="w-full sm:w-[150px] bg-background">
+          <SelectTrigger className="w-full sm:w-37.5 bg-background">
             <SelectValue placeholder="Kategori" />
           </SelectTrigger>
           <SelectContent>
@@ -71,7 +71,7 @@ export function ReportFilters({
         </Select>
 
         <Select value={statusFilter} onValueChange={handleStatusChange}>
-          <SelectTrigger className="w-full sm:w-[150px] bg-background">
+          <SelectTrigger className="w-full sm:w-37.5 bg-background">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
