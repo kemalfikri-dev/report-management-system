@@ -55,20 +55,43 @@ export const showReport = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Unauthorized: Missing user ID" });
     }
 
-    const myReports = await prisma.report.findMany({
-      where: {
-        userId: userId,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const search = req.query.search as string;
+    const category = req.query.category as string;
+    const status = req.query.status as string;
 
-    if (myReports.length === 0) {
-      return res.status(200).json(myReports);
+    const skip = (page - 1) * limit;
+    const where: any = { userId };
+
+    if (category && category !== "ALL") where.category = category;
+    if (status && status !== "ALL") where.status = status;
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: "insensitive" } },
+        { description: { contains: search, mode: "insensitive" } },
+      ];
     }
 
-    return res.status(200).json(myReports);
+    const [myReports, total] = await Promise.all([
+      prisma.report.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.report.count({ where }),
+    ]);
+
+    return res.status(200).json({
+      data: myReports,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Gagal mengambil laporan Anda" });
@@ -222,17 +245,43 @@ export const adminReportList = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Unauthorized: Missing user ID" });
     }
 
-    const allReports = await prisma.report.findMany({
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const search = req.query.search as string;
+    const category = req.query.category as string;
+    const status = req.query.status as string;
 
-    if (allReports.length === 0) {
-      return res.status(200).json(allReports);
+    const skip = (page - 1) * limit;
+    const where: any = {};
+
+    if (category && category !== "ALL") where.category = category;
+    if (status && status !== "ALL") where.status = status;
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: "insensitive" } },
+        { description: { contains: search, mode: "insensitive" } },
+      ];
     }
 
-    return res.status(200).json(allReports);
+    const [allReports, total] = await Promise.all([
+      prisma.report.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.report.count({ where }),
+    ]);
+
+    return res.status(200).json({
+      data: allReports,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Gagal mengambil laporan Anda" });

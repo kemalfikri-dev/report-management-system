@@ -54,3 +54,10 @@ interface ReportActionProps {
   selectedReport: Report;
   refetch: () => void;
 }
+
+interface PaginationMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
