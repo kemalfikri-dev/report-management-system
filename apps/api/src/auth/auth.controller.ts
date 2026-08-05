@@ -2,13 +2,16 @@ import { Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
 import { prisma } from "../lib/db";
 import bcrypt from "bcrypt";
+import { z } from "zod";
+import { loginSchema, registerSchema } from "../validators/auth.validator";
 
 // -- USER AUTH --//
 
 // -- Register --
 export const register = async (req: Request, res: Response) => {
   try {
-    const { name, email, password } = req.body;
+    const validatedData = registerSchema.parse(req.body);
+    const { name, email, password } = validatedData;
 
     const existing = await prisma.user.findUnique({
       where: { email },
@@ -32,6 +35,9 @@ export const register = async (req: Request, res: Response) => {
       message: "Register sukses",
     });
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      return res.status(400).json({ error: err.errors[0].message });
+    }
     console.log(err);
     res.status(500).json({ error: "Terjadi kesalahan, coba lagi!" });
   }
@@ -40,7 +46,8 @@ export const register = async (req: Request, res: Response) => {
 // -- Login --
 export const login = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body;
+    const validatedData = loginSchema.parse(req.body);
+    const { email, password } = validatedData;
 
     const user = await prisma.user.findUnique({
       where: { email },

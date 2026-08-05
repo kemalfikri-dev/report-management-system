@@ -1,29 +1,25 @@
 import { Request, Response } from "express";
 import { Category } from "@prisma/client";
 import { prisma } from "../lib/db";
+import { z } from "zod";
+import {
+  createReportSchema,
+  updateReportSchema,
+  updateReportStatusSchema,
+} from "../validators/report.validator";
 
 // -- USER REPORT --//
 
 // --Create Reports --
 export const createReport = async (req: Request, res: Response) => {
   try {
-    const { title, description, category } = req.body;
+    const validatedData = createReportSchema.parse(req.body);
+    const { title, description, category } = validatedData;
 
     const userId = req.user?.id;
 
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized: Missing user ID" });
-    }
-
-    if (!title || !description || !category) {
-      return res
-        .status(400)
-        .json({ error: "Kolom title, description, dan category wajib diisi!" });
-    }
-
-    const validCategories = Object.values(Category);
-    if (!validCategories.includes(category)) {
-      return res.status(400).json({ error: "Kategori laporan tidak valid!" });
     }
 
     await prisma.report.create({
@@ -40,6 +36,9 @@ export const createReport = async (req: Request, res: Response) => {
       message: "Report berhasil dibuat",
     });
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      return res.status(400).json({ error: err.errors[0].message });
+    }
     console.log(err);
     res
       .status(500)
@@ -112,7 +111,8 @@ export const reportById = async (req: Request, res: Response) => {
 // -- Update Report --
 export const updateReport = async (req: Request, res: Response) => {
   try {
-    const { title, description, category } = req.body;
+    const validatedData = updateReportSchema.parse(req.body);
+    const { title, description, category } = validatedData;
     const userId = req.user?.id;
 
     if (!userId) {
@@ -139,17 +139,6 @@ export const updateReport = async (req: Request, res: Response) => {
       });
     }
 
-    if (!title || !description || !category) {
-      return res.status(400).json({
-        error: "Semua field wajib diisi",
-      });
-    }
-
-    const validCategories = Object.values(Category);
-    if (!validCategories.includes(category)) {
-      return res.status(400).json({ error: "Kategori laporan tidak valid!" });
-    }
-
     const updatedReport = await prisma.report.update({
       where: {
         id: reportId,
@@ -166,6 +155,9 @@ export const updateReport = async (req: Request, res: Response) => {
       updatedReport,
     });
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      return res.status(400).json({ error: err.errors[0].message });
+    }
     console.log(err);
     res
       .status(500)
@@ -264,17 +256,8 @@ export const updateReportStatus = async (req: Request, res: Response) => {
         .json({ message: "Bad Request: Invalid Report ID" });
     }
 
-    const { status, rejectReason } = req.body;
-
-    if (!status || !["APPROVED", "REJECTED"].includes(status)) {
-      return res.status(400).json({ message: "Invalid status provided" });
-    }
-
-    if (status === "REJECTED" && !rejectReason) {
-      return res
-        .status(400)
-        .json({ error: "Alasan penolakan (reject reason) wajib diisi!" });
-    }
+    const validatedData = updateReportStatusSchema.parse(req.body);
+    const { status, rejectReason } = validatedData;
 
     const updatedReport = await prisma.report.update({
       where: {
@@ -291,6 +274,9 @@ export const updateReportStatus = async (req: Request, res: Response) => {
       updatedReport,
     });
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      return res.status(400).json({ error: err.errors[0].message });
+    }
     console.log(err);
     res
       .status(500)
