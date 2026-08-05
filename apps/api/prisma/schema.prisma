@@ -20,28 +20,28 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String
-  password  String
-
+  id       String @id @default(cuid())
+  email    String @unique
+  name     String
+  password String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  reports   Report[]
+  reports Report[]
 }
 
 model Report {
-  id        String   @id@default(cuid())
-  title     String
-  description String 
-  status    Status   @default(PENDING)
-  category  Category 
-  
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  status      Status   @default(PENDING)
+  category    Category
 
-  userId    String
-  user      User @relation(fields: [userId], references: [id])
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  rejectReasong String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -42,3 +42,13 @@ interface UserProps {
   isLoading: boolean;
   checkUser: () => Promise<void>;
 }
+
+interface AdminReportListProps {
+  refetch: () => void;
+  selectedReport: Report;
+}
+
+interface ApproveReportProps {
+  selectedReport: Report;
+  refetch: () => void;
+}
