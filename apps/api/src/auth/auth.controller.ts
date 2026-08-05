@@ -59,6 +59,7 @@ export const login = async (req: Request, res: Response) => {
     const payload = {
       name: user.name,
       id: user.id,
+      role: user.role,
     };
     const secret = process.env.JWT_SECRET;
 
