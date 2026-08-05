@@ -1,33 +1,44 @@
-import { Request, Response, NextFunction} from "express";
-import * as jwt from "jsonwebtoken"
+import { Request, Response, NextFunction } from "express";
+import * as jwt from "jsonwebtoken";
 import { UserPayload } from "@/types/express";
 
-
-
-export const verifyToken = ( 
+export const verifyToken = (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
-  const authHeader = req.headers.authorization;
-  const token = authHeader && authHeader.split(' ')[1];
-  const secret = process.env.JWT_SECRET
-    
+  const token = req.cookies.access_token;
+  const secret = process.env.JWT_SECRET;
+
   if (!secret) {
     return res.status(500).json({ message: "Server configuration error" });
   }
 
-  if(!token){
-    return res.status(401).json({message: 'Access Denied: Token tidak ditemukan'})
+  if (!token) {
+    return res
+      .status(401)
+      .json({ message: "Access Denied: Token tidak ditemukan" });
   }
   try {
-    const verifyPayload = jwt.verify(token, secret) as UserPayload ;
+    const verifyPayload = jwt.verify(token, secret) as UserPayload;
 
     req.user = verifyPayload;
 
     next();
+  } catch (err) {
+    return res.status(403).json({ message: "Invalid or Expired Token" });
   }
-  catch (err) {
-    return res.status(403).json({message: 'Invalid or Expired Token'})
+};
+
+export const verifyAdmin = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (req.user?.role !== "ADMIN") {
+    return res
+      .status(403)
+      .json({ message: "Access Denied: Admin role required" });
   }
-}
+  next();
+};

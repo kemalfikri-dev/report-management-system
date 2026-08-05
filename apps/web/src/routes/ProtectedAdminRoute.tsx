@@ -3,7 +3,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { useContext } from "react";
 import { Navigate } from "react-router-dom";
 
-export function ProtectedRoute() {
+export function ProtectedAdminRoute() {
   const { user, isLoading } = useContext(AuthContext) as UserProps;
 
   if (isLoading === true) {
@@ -12,6 +12,10 @@ export function ProtectedRoute() {
 
   if (user === null) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (user.role !== "ADMIN") {
+    return <Navigate to="/" replace />;
   }
 
   return <AppLayout />;

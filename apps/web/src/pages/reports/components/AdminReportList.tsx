@@ -1,15 +1,15 @@
 import { Button } from "@/components/ui/button";
-import { CreateDialogReport } from "./CreateDialogReport";
-import { EditDialogReport } from "./EditDialogReport";
-import { DeleteReport } from "./DeleteReport";
 import { DialogReport } from "./DialogReport";
-import { useState, useEffect } from "react";
-import { useReport } from "../hooks/useReport";
+import { EditDialogReport } from "./EditDialogReport";
+import { ApproveButton } from "./ApproveButton";
+import { RejectDialog } from "./RejectDialog";
+import { useState, Fragment, useEffect } from "react";
+import { useAdminReport } from "../hooks/useAdminReport";
 import { ReportCard } from "./ReportCard";
 import { ReportFilters } from "./ReportFilters";
 import { FileSearch } from "lucide-react";
 
-export function ReportListPage() {
+export function AdminReportList() {
   const [page, setPage] = useState(1);
   const [searchFilter, setSearchFilter] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -21,7 +21,7 @@ export function ReportListPage() {
     return () => clearTimeout(timer);
   }, [searchFilter]);
 
-  const { reports, meta, refetch, isLoading } = useReport({
+  const { allReports, meta, adminRefetch, isLoading } = useAdminReport({
     page,
     limit: 10,
     search: debouncedSearch,
@@ -33,12 +33,11 @@ export function ReportListPage() {
     <div className="mx-auto max-w-5xl px-6 space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Laporan Saya</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Semua Laporan</h1>
           <p className="text-muted-foreground mt-1">
-            Kelola dan pantau status laporan yang telah Anda buat.
+            Pantau dan kelola seluruh laporan dari pengguna di sistem ini.
           </p>
         </div>
-        <CreateDialogReport refetch={refetch} />
       </div>
 
       <ReportFilters
@@ -53,7 +52,7 @@ export function ReportListPage() {
 
       {meta && meta.total > 0 && (
         <div className="text-sm text-muted-foreground font-medium">
-          Menampilkan {reports.length} dari {meta.total} laporan
+          Menampilkan {allReports.length} dari {meta.total} laporan
         </div>
       )}
 
@@ -62,29 +61,33 @@ export function ReportListPage() {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
           Memuat laporan...
         </div>
-      ) : reports.length === 0 ? (
+      ) : allReports.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 px-4 border-2 border-dashed rounded-xl bg-card/50 text-center">
           <div className="bg-muted p-4 rounded-full mb-4">
             <FileSearch className="h-8 w-8 text-muted-foreground" />
           </div>
           <h3 className="text-xl font-semibold mb-2">Tidak ada laporan</h3>
-          <p className="text-muted-foreground max-w-md mb-6">
-            Anda belum memiliki laporan atau tidak ada laporan yang sesuai dengan filter pencarian Anda.
+          <p className="text-muted-foreground max-w-md mb-8">
+            Belum ada laporan yang sesuai dengan filter pencarian saat ini.
           </p>
-          <CreateDialogReport refetch={refetch} />
         </div>
       ) : (
         <div className="space-y-6">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {reports.map((report) => (
+            {allReports.map((report) => (
               <ReportCard
                 key={report.id}
                 report={report}
                 actions={
                   <>
+                    <EditDialogReport refetch={adminRefetch} selectedReport={report} />
                     <DialogReport selectedReport={report} />
-                    <EditDialogReport refetch={refetch} selectedReport={report} />
-                    <DeleteReport refetch={refetch} selectedReport={report} />
+                    {report.status === "PENDING" && (
+                      <Fragment>
+                        <ApproveButton selectedReport={report} refetch={adminRefetch} />
+                        <RejectDialog selectedReport={report} refetch={adminRefetch} />
+                      </Fragment>
+                    )}
                   </>
                 }
               />

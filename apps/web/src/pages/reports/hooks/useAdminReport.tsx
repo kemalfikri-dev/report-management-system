@@ -1,10 +1,17 @@
 import apiClient, { isAxiosError } from "@/lib/axios";
 import { toast } from "sonner";
 import { useCallback, useEffect, useState } from "react";
-import type { FetchReportsParams } from "./useAdminReport";
 
-export function useReport(params: FetchReportsParams = {}) {
-  const [reports, setReports] = useState<Report[]>([]);
+export interface FetchReportsParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  category?: string;
+  status?: string;
+}
+
+export function useAdminReport(params: FetchReportsParams = {}) {
+  const [allReports, setAllReports] = useState<Report[]>([]);
   const [meta, setMeta] = useState<PaginationMeta | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -21,11 +28,11 @@ export function useReport(params: FetchReportsParams = {}) {
     if (params.status) queryParams.append("status", params.status);
 
     apiClient
-      .get(`/reports?${queryParams.toString()}`)
+      .get(`/admin/reports?${queryParams.toString()}`)
       .then((res) => {
         if (!cancelled) {
           setIsError(false);
-          setReports(Array.isArray(res.data?.data) ? res.data.data : []);
+          setAllReports(Array.isArray(res.data?.data) ? res.data.data : []);
           setMeta(res.data?.meta || null);
         }
       })
@@ -54,11 +61,11 @@ export function useReport(params: FetchReportsParams = {}) {
     params.status,
   ]);
 
-  const refetch = useCallback(() => {
+  const adminRefetch = useCallback(() => {
     setIsLoading(true);
     setIsError(false);
     setRefreshKey((k) => k + 1);
   }, []);
 
-  return { reports, setReports, meta, isLoading, isError, refetch };
+  return { allReports, setAllReports, meta, isLoading, isError, adminRefetch };
 }
