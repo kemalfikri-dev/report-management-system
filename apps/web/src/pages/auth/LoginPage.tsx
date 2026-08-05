@@ -3,7 +3,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -99,24 +98,21 @@ export function LoginPage() {
                 </a>
               </div>
             </div>
-            <CardFooter className="flex-col gap-2">
+            <div className="flex flex-col gap-4 mt-6">
               <Button
                 disabled={isLoading}
-                variant="outline"
-                className="w-full cursor-pointer"
+                className="w-full"
                 type="submit"
               >
                 {isLoading ? "Processing..." : "Login"}
               </Button>
-              <div className="flex items-center">
-                <p className="">
-                  Don't Have An Account?{" "}
-                  <Link to="/register" className="">
-                    Sign Up!
-                  </Link>{" "}
-                </p>
+              <div className="text-center text-sm text-muted-foreground">
+                Don't have an account?{" "}
+                <Link to="/register" className="underline underline-offset-4 hover:text-primary">
+                  Sign up
+                </Link>
               </div>
-            </CardFooter>
+            </div>
           </form>
         </CardContent>
       </Card>

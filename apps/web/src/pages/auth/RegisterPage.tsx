@@ -4,7 +4,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -102,24 +101,21 @@ export function RegisterPage() {
                 />
               </div>
             </div>
-            <CardFooter className="flex-col gap-2">
+            <div className="flex flex-col gap-4 mt-6">
               <Button
                 disabled={isLoading}
-                variant="outline"
-                className="w-full cursor-pointer"
+                className="w-full"
                 type="submit"
               >
                 {isLoading ? "Registering..." : "Register"}
               </Button>
-              <div className="flex items-center">
-                <p className="">
-                  Already Have An Account?{" "}
-                  <Link to="/login" className="">
-                    Login!
-                  </Link>{" "}
-                </p>
+              <div className="text-center text-sm text-muted-foreground">
+                Already have an account?{" "}
+                <Link to="/login" className="underline underline-offset-4 hover:text-primary">
+                  Login
+                </Link>
               </div>
-            </CardFooter>
+            </div>
           </form>
         </CardContent>
       </Card>

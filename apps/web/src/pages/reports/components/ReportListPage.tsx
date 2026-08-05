@@ -1,22 +1,13 @@
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import dayjs from "dayjs";
-import { DialogReport } from "./DialogReport";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
 import { CreateDialogReport } from "./CreateDialogReport";
 import { EditDialogReport } from "./EditDialogReport";
 import { DeleteReport } from "./DeleteReport";
+import { DialogReport } from "./DialogReport";
 import { useState, useEffect } from "react";
 import { useReport } from "../hooks/useReport";
+import { ReportCard } from "./ReportCard";
+import { ReportFilters } from "./ReportFilters";
+import { FileSearch } from "lucide-react";
 
 export function ReportListPage() {
   const [page, setPage] = useState(1);
@@ -39,129 +30,88 @@ export function ReportListPage() {
   });
 
   return (
-    <div className="mx-auto max-w-3xl p-4 space-y-6">
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold">My Reports</h2>
-          <CreateDialogReport refetch={refetch} />
-        </div>
-
-        <div className="flex gap-2 items-center">
-          <Select
-            value={categoryFilter}
-            onValueChange={(val) => {
-              setCategoryFilter(val);
-              setPage(1);
-            }}
-          >
-            <SelectTrigger id="checkout-category-ts6">
-              <SelectValue placeholder="Select Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="ALL">ALL</SelectItem>
-                <SelectItem value="MAINTENANCE">MAINTENANCE</SelectItem>
-                <SelectItem value="COMPLAINT">COMPLAINT</SelectItem>
-                <SelectItem value="BUG">BUG</SelectItem>
-                <SelectItem value="FEATURE">FEATURE</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-
-          <Select
-            value={statusFilter}
-            onValueChange={(val) => {
-              setStatusFilter(val);
-              setPage(1);
-            }}
-          >
-            <SelectTrigger id="checkout-category-ts7">
-              <SelectValue placeholder="Select Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="ALL">ALL</SelectItem>
-                <SelectItem value="PENDING">PENDING</SelectItem>
-                <SelectItem value="APPROVED">APPROVED</SelectItem>
-                <SelectItem value="REJECTED">REJECTED</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <Input
-          placeholder="Search Reports..."
-          className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-          value={searchFilter}
-          onChange={(event) => {
-            setSearchFilter(event.target.value);
-            setPage(1);
-          }}
-        />
-
-        {meta ? (
-          <p className="text-sm text-muted-foreground">
-            {meta.total} reports found (Page {meta.page} of {meta.totalPages || 1})
+    <div className="mx-auto max-w-5xl px-6 space-y-8 animate-in fade-in duration-500">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Laporan Saya</h1>
+          <p className="text-muted-foreground mt-1">
+            Kelola dan pantau status laporan yang telah Anda buat.
           </p>
-        ) : null}
+        </div>
+        <CreateDialogReport refetch={refetch} />
       </div>
 
+      <ReportFilters
+        searchFilter={searchFilter}
+        setSearchFilter={setSearchFilter}
+        categoryFilter={categoryFilter}
+        setCategoryFilter={setCategoryFilter}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+        onFilterChange={() => setPage(1)}
+      />
+
+      {meta && meta.total > 0 && (
+        <div className="text-sm text-muted-foreground font-medium">
+          Menampilkan {reports.length} dari {meta.total} laporan
+        </div>
+      )}
+
       {isLoading ? (
-        <div className="flex justify-center p-8">Loading reports...</div>
+        <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
+          Memuat laporan...
+        </div>
       ) : reports.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 px-4 border-2 border-dashed rounded-xl bg-card/50 mt-4 text-center">
-          <h3 className="text-xl font-semibold mb-2">No reports found</h3>
-          <p className="text-muted-foreground max-w-md mb-8">
-            You don't have any reports yet or no reports match your current filters.
+        <div className="flex flex-col items-center justify-center py-24 px-4 border-2 border-dashed rounded-xl bg-card/50 text-center">
+          <div className="bg-muted p-4 rounded-full mb-4">
+            <FileSearch className="h-8 w-8 text-muted-foreground" />
+          </div>
+          <h3 className="text-xl font-semibold mb-2">Tidak ada laporan</h3>
+          <p className="text-muted-foreground max-w-md mb-6">
+            Anda belum memiliki laporan atau tidak ada laporan yang sesuai dengan filter pencarian Anda.
           </p>
           <CreateDialogReport refetch={refetch} />
         </div>
       ) : (
-        <div className="space-y-4">
-          {reports.map((report) => (
-            <div
-              key={report.id}
-              className="border rounded-lg p-4 space-y-3 bg-card shadow-sm"
-            >
-              <h3 className="font-semibold text-lg truncate">{report.title}</h3>
-
-              <div className="flex gap-2">
-                <Badge variant="secondary">{report.category}</Badge>
-                <Badge variant="default">{report.status}</Badge>
-              </div>
-
-              <div className="flex justify-between items-center pt-2">
-                <p className="text-sm text-muted-foreground">
-                  {dayjs(report.createdAt).format("DD MMMM YYYY, HH:mm")}
-                </p>
-                <div className="flex gap-2">
-                  <EditDialogReport refetch={refetch} selectedReport={report} />
-                  <DialogReport selectedReport={report} />
-                  <DeleteReport refetch={refetch} selectedReport={report} />
-                </div>
-              </div>
-            </div>
-          ))}
+        <div className="space-y-6">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {reports.map((report) => (
+              <ReportCard
+                key={report.id}
+                report={report}
+                actions={
+                  <>
+                    <DialogReport selectedReport={report} />
+                    <EditDialogReport refetch={refetch} selectedReport={report} />
+                    <DeleteReport refetch={refetch} selectedReport={report} />
+                  </>
+                }
+              />
+            ))}
+          </div>
 
           {/* Pagination Controls */}
           {meta && meta.totalPages > 1 && (
-            <div className="flex justify-center gap-4 items-center pt-4">
+            <div className="flex justify-center items-center gap-4 pt-6 pb-12">
               <Button
                 variant="outline"
+                size="sm"
                 disabled={page === 1}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
               >
-                Previous
+                Sebelumnya
               </Button>
-              <span className="text-sm font-medium">
-                Page {page} of {meta.totalPages}
+              <span className="text-sm font-medium text-muted-foreground">
+                Halaman {page} dari {meta.totalPages}
               </span>
               <Button
                 variant="outline"
+                size="sm"
                 disabled={page >= meta.totalPages}
                 onClick={() => setPage((p) => p + 1)}
               >
-                Next
+                Selanjutnya
               </Button>
             </div>
           )}
