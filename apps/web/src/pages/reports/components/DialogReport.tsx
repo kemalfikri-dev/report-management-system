@@ -30,6 +30,13 @@ export function DialogReport({ selectedReport }: { selectedReport: Report }) {
               <Badge>{selectedReport.status}</Badge>
             </div>
             <DialogDescription>{selectedReport.description}</DialogDescription>
+            {selectedReport.status === "REJECTED" &&
+              selectedReport.rejectReason && (
+                <div className="mt-4 p-3 bg-red-100 border border-red-300 rounded-md text-sm text-red-800">
+                  <strong>Alasan Penolakan:</strong>{" "}
+                  {selectedReport.rejectReason}
+                </div>
+              )}
           </DialogHeader>
           <DialogFooter className="sm:justify-start">
             <p className="text-sm text-muted-foreground">

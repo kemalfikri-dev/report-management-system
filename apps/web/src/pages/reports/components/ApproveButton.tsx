@@ -4,12 +4,14 @@ import type { ApiErrorResponse } from "@/types/auth";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export function ApproveButton({ selectedReport, refetch }: ApproveReportProps) {
+export function ApproveButton({ selectedReport, refetch }: ReportActionProps) {
   const [isLoading, setIsLoading] = useState(false);
   async function handleApprove() {
     setIsLoading(true);
     try {
-      await apiClient.put(`/admin/reports/${selectedReport.id}`);
+      await apiClient.patch(`/admin/reports/${selectedReport.id}/status`, {
+        status: "APPROVED",
+      });
       toast.success("Report di Approve");
       refetch();
     } catch (err) {

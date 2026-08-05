@@ -247,12 +247,12 @@ export const adminReportList = async (req: Request, res: Response) => {
   }
 };
 
-// -- Approve Report --
-export const approveReport = async (req: Request, res: Response) => {
+// -- Update Report Status (Approve/Reject) --
+export const updateReportStatus = async (req: Request, res: Response) => {
   try {
-    const UserId = req.user?.id;
+    const userId = req.user?.id;
 
-    if (!UserId) {
+    if (!userId) {
       return res.status(401).json({ message: "Unauthorized: Missing user ID" });
     }
 
@@ -264,23 +264,36 @@ export const approveReport = async (req: Request, res: Response) => {
         .json({ message: "Bad Request: Invalid Report ID" });
     }
 
-    const approveReport = await prisma.report.update({
+    const { status, rejectReason } = req.body;
+
+    if (!status || !["APPROVED", "REJECTED"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status provided" });
+    }
+
+    if (status === "REJECTED" && !rejectReason) {
+      return res
+        .status(400)
+        .json({ error: "Alasan penolakan (reject reason) wajib diisi!" });
+    }
+
+    const updatedReport = await prisma.report.update({
       where: {
         id: reportId,
       },
       data: {
-        status: "APPROVED",
+        status: status,
+        rejectReason: status === "REJECTED" ? rejectReason : null,
       },
     });
 
     return res.status(200).json({
-      message: "Report berhasil diUpdate",
-      approveReport,
+      message: `Report berhasil di-${status.toLowerCase()}`,
+      updatedReport,
     });
   } catch (err) {
     console.log(err);
     res
       .status(500)
-      .json({ message: "Terjadi kesalahan saat mengubah laporan!" });
+      .json({ message: "Terjadi kesalahan saat mengubah status laporan!" });
   }
 };

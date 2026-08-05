@@ -4,6 +4,7 @@ interface Report {
   category: string;
   status: string;
   description: string;
+  rejectReason?: string | null;
   createdAt: string;
 }
 
@@ -48,7 +49,7 @@ interface AdminReportListProps {
   selectedReport: Report;
 }
 
-interface ApproveReportProps {
+interface ReportActionProps {
   selectedReport: Report;
   refetch: () => void;
 }

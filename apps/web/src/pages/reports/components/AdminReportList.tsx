@@ -14,6 +14,7 @@ import {
 import { Plus } from "lucide-react";
 import { EditDialogReport } from "./EditDialogReport";
 import { ApproveButton } from "./ApproveButton";
+import { RejectDialog } from "./RejectDialog";
 import { useState } from "react";
 import { useAdminReport } from "../hooks/useAdminReport";
 
@@ -137,10 +138,18 @@ export function AdminReportList() {
                     selectedReport={report}
                   />
                   <DialogReport selectedReport={report} />
-                  <ApproveButton
-                    selectedReport={report}
-                    refetch={adminRefetch}
-                  />
+                  {report.status === "PENDING" && (
+                    <>
+                      <ApproveButton
+                        selectedReport={report}
+                        refetch={adminRefetch}
+                      />
+                      <RejectDialog
+                        selectedReport={report}
+                        refetch={adminRefetch}
+                      />
+                    </>
+                  )}
                 </div>
               </div>
             </div>

@@ -6,7 +6,7 @@ import {
   reportById,
   showReport,
   updateReport,
-  approveReport,
+  updateReportStatus,
 } from "./report.controller";
 import { verifyToken } from "../auth/auth.middleware";
 
@@ -31,6 +31,6 @@ router.delete("/reports/:id", verifyToken, deleteReport);
 // -- Get All Report --
 router.get("/admin/reports", verifyToken, adminReportList);
 
-// -- Approve Report --
-router.put("/admin/reports/:id", verifyToken, approveReport);
+// -- Update Report Status --
+router.patch("/admin/reports/:id/status", verifyToken, updateReportStatus);
 export default router;
