@@ -36,7 +36,7 @@ export const register = async (req: Request, res: Response) => {
     });
   } catch (err) {
     if (err instanceof z.ZodError) {
-      return res.status(400).json({ error: err.errors[0].message });
+      return res.status(400).json({ error: err.issues[0].message });
     }
     console.log(err);
     res.status(500).json({ error: "Terjadi kesalahan, coba lagi!" });
@@ -66,7 +66,7 @@ export const login = async (req: Request, res: Response) => {
     const payload = {
       name: user.name,
       id: user.id,
-      role: user.role,
+      role: (user as any).role,
     };
     const secret = process.env.JWT_SECRET;
 
