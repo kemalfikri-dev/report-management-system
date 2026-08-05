@@ -8,7 +8,7 @@ import {
   updateReport,
   updateReportStatus,
 } from "./report.controller";
-import { verifyToken } from "../auth/auth.middleware";
+import { verifyToken, verifyAdmin } from "../auth/auth.middleware";
 
 const router = express.Router();
 
@@ -29,8 +29,8 @@ router.delete("/reports/:id", verifyToken, deleteReport);
 
 // -- ADMIN REPORT ROUTE -- //
 // -- Get All Report --
-router.get("/admin/reports", verifyToken, adminReportList);
+router.get("/admin/reports", verifyToken, verifyAdmin, adminReportList);
 
 // -- Update Report Status --
-router.patch("/admin/reports/:id/status", verifyToken, updateReportStatus);
+router.patch("/admin/reports/:id/status", verifyToken, verifyAdmin, updateReportStatus);
 export default router;

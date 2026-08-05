@@ -8,6 +8,8 @@ import { AutoRoute } from "./routes/AutoRoute";
 import { ShowReport } from "./pages/reports/ShowReport";
 import { AdminReportList } from "./pages/reports/components/AdminReportList";
 
+import { ProtectedAdminRoute } from "./routes/ProtectedAdminRoute";
+
 function App() {
   return (
     <>
@@ -15,6 +17,8 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<DashboardPage />}></Route>
           <Route path="/reports" element={<ShowReport />}></Route>
+        </Route>
+        <Route element={<ProtectedAdminRoute />}>
           <Route path="/admin/reports" element={<AdminReportList />}></Route>
         </Route>
         <Route element={<AutoRoute />}>

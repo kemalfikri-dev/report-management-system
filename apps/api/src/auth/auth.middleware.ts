@@ -29,3 +29,16 @@ export const verifyToken = (
     return res.status(403).json({ message: "Invalid or Expired Token" });
   }
 };
+
+export const verifyAdmin = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (req.user?.role !== "ADMIN") {
+    return res
+      .status(403)
+      .json({ message: "Access Denied: Admin role required" });
+  }
+  next();
+};
