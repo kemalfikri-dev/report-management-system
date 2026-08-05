@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { Category } from "@prisma/client";
 import { prisma } from "../lib/db";
 
+// -- USER REPORT --//
+
 // --Create Reports --
 export const createReport = async (req: Request, res: Response) => {
   try {
@@ -214,5 +216,84 @@ export const deleteReport = async (req: Request, res: Response) => {
     res
       .status(500)
       .json({ message: "Terjadi kesalahan saat menghapus laporan" });
+  }
+};
+
+// -- ADMIN REPORT --//
+
+// -- Get All Report --
+export const adminReportList = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized: Missing user ID" });
+    }
+
+    const allReports = await prisma.report.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    if (allReports.length === 0) {
+      return res.status(200).json(allReports);
+    }
+
+    return res.status(200).json(allReports);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Gagal mengambil laporan Anda" });
+  }
+};
+
+// -- Update Report Status (Approve/Reject) --
+export const updateReportStatus = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized: Missing user ID" });
+    }
+
+    const reportId = req.params.id;
+
+    if (!reportId || typeof reportId !== "string") {
+      return res
+        .status(400)
+        .json({ message: "Bad Request: Invalid Report ID" });
+    }
+
+    const { status, rejectReason } = req.body;
+
+    if (!status || !["APPROVED", "REJECTED"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status provided" });
+    }
+
+    if (status === "REJECTED" && !rejectReason) {
+      return res
+        .status(400)
+        .json({ error: "Alasan penolakan (reject reason) wajib diisi!" });
+    }
+
+    const updatedReport = await prisma.report.update({
+      where: {
+        id: reportId,
+      },
+      data: {
+        status: status,
+        rejectReason: status === "REJECTED" ? rejectReason : null,
+      },
+    });
+
+    return res.status(200).json({
+      message: `Report berhasil di-${status.toLowerCase()}`,
+      updatedReport,
+    });
+  } catch (err) {
+    console.log(err);
+    res
+      .status(500)
+      .json({ message: "Terjadi kesalahan saat mengubah status laporan!" });
   }
 };

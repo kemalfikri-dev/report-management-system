@@ -4,6 +4,7 @@ interface Report {
   category: string;
   status: string;
   description: string;
+  rejectReason?: string | null;
   createdAt: string;
 }
 
@@ -41,4 +42,14 @@ interface UserProps {
   user: User | null;
   isLoading: boolean;
   checkUser: () => Promise<void>;
+}
+
+interface AdminReportListProps {
+  refetch: () => void;
+  selectedReport: Report;
+}
+
+interface ReportActionProps {
+  selectedReport: Report;
+  refetch: () => void;
 }
