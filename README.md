@@ -1,6 +1,6 @@
-# 📋 Report Management System
+# Report Management System
 
-A full-stack web application for managing reports with end-to-end authentication. Built with a **React** frontend and **Express + Prisma** backend, secured using **JWT**.
+A full-stack web application for managing reports with end-to-end authentication and Role-Based Access Control (RBAC). Built with a **React** frontend and **Express + Prisma** backend, secured using **HTTP-Only JWT Cookies**.
 
 ---
 
@@ -12,11 +12,12 @@ A full-stack web application for managing reports with end-to-end authentication
 | React 19 | UI Library |
 | TypeScript | Type Safety |
 | Vite | Build Tool & Dev Server |
-| React Router v7 | Client-side Routing |
-| Axios | HTTP Client |
-| Tailwind CSS v4 | Styling |
+| React Router v7 | Client-side Routing & Guards |
+| Axios | HTTP Client (with `withCredentials`) |
+| Tailwind CSS v4 | Utility-first Styling |
+| shadcn/ui | Accessible UI Components |
+| Zod & RHF | Form validation |
 | Sonner | Toast Notifications |
-| shadcn/ui | UI Components |
 
 ### Backend (`apps/api`)
 | Tech | Description |
@@ -24,71 +25,66 @@ A full-stack web application for managing reports with end-to-end authentication
 | Express 5 | Web Framework |
 | TypeScript | Type Safety |
 | Prisma ORM | Database Access |
-| PostgreSQL (Neon) | Database |
-| JSON Web Token (JWT) | Authentication |
+| PostgreSQL | Relational Database |
+| JWT via Cookies | Secure Authentication |
 | bcrypt | Password Hashing |
-| dotenv | Environment Variables |
+| Zod | Request Validation |
+
+---
+
+## 🌟 Key Features
+
+1. **Role-Based Access Control (RBAC)**
+   - **USER**: Can create, view, edit, and delete their own reports.
+   - **ADMIN**: Can view all reports system-wide, approve, or reject them with reasons.
+2. **Secure Authentication**
+   - JWT tokens are stored securely in `HTTP-Only` cookies to prevent XSS attacks.
+3. **Interactive Dashboard**
+   - Real-time statistics (Total, Pending, Approved, Rejected).
+   - Recent activity logs for quick insights.
+4. **Minimalist & Clean UI**
+   - Professional, emoji-free, and sleek interface built with Shadcn UI.
+   - Fully responsive design for mobile and desktop.
 
 ---
 
 ## 📁 Project Structure
 
-```
+```text
 report-management-system/
 ├── apps/
 │   ├── api/                        # Backend (Express + Prisma)
 │   │   ├── prisma/
-│   │   │   ├── schema.prisma       # Database schema
-│   │   │   └── migrations/         # Prisma migrations
+│   │   │   └── schema.prisma       # Database schema (Models: User, Report)
 │   │   └── src/
-│   │       ├── auth/
-│   │       │   ├── controllers/    # Register & Login logic
-│   │       │   ├── middlewares/    # verifyToken JWT middleware
-│   │       │   └── routes/         # Auth routes
-│   │       ├── Report/
-│   │       │   ├── controllers/    # Create & fetch reports
-│   │       │   └── routes/         # Report routes
-│   │       ├── dashboard/
-│   │       │   ├── controllers/    # Dashboard data
-│   │       │   └── routes/         # Dashboard routes
-│   │       ├── lib/
-│   │       │   └── db.ts           # Prisma client instance
-│   │       ├── types/
-│   │       │   └── express.d.ts    # Extended Express Request type
-│   │       └── server.ts           # Entry point
+│   │       ├── auth/               # Auth controllers & JWT middleware
+│   │       ├── report/             # Report CRUD & Admin approval logic
+│   │       ├── dashboard/          # Statistics & recent activity logic
+│   │       ├── validators/         # Zod schemas for request validation
+│   │       ├── lib/                # Database and util functions
+│   │       └── server.ts           # Express entry point
 │   │
 │   └── web/                        # Frontend (React + Vite)
 │       └── src/
+│           ├── components/         # Global components (Navbar, Layouts)
 │           ├── pages/
-│           │   ├── auth/
-│           │   │   ├── LoginPage.tsx
-│           │   │   └── RegisterPage.tsx
+│           │   ├── auth/           # Login & Register views
+│           │   ├── reports/        # Report Lists, Cards, and Dialogs
 │           │   └── DashboardPage.tsx
-│           ├── routes/
-│           │   ├── ProtectedRoute.tsx  # Redirect to /login if no token
-│           │   └── AutoRoute.tsx       # Redirect to / if logged in
-│           ├── lib/
-│           │   └── axios.ts            # Axios instance with base URL
-│           ├── types/
-│           │   └── auth.ts             # Auth type definitions
-│           └── App.tsx                 # Route definitions
+│           ├── routes/             # ProtectedRoute & ProtectedAdminRoute
+│           ├── hooks/              # Custom data-fetching hooks
+│           ├── context/            # AuthContext
+│           └── lib/                # Axios instance configuration
 ```
 
 ---
 
 ## 🔐 Authentication Flow
 
-```
-User → Register (/api/register)
-     → Login    (/api/login)  → JWT Token (1 hour expiry)
-     → Store token in localStorage
-     → Access protected routes with Bearer token header
-     → verifyToken middleware validates JWT on every protected request
-```
-
-### Route Guards
-- **`ProtectedRoute`** — Redirects to `/login` if user is not authenticated
-- **`AutoRoute`** — Redirects to `/` if user is already logged in
+1. User registers or logs in via `/api/register` or `/api/login`.
+2. Backend validates credentials, generates a JWT, and attaches it as an `HTTP-Only` cookie (`access_token`).
+3. Frontend uses Axios with `withCredentials: true` to automatically send the cookie on subsequent requests.
+4. `verifyToken` middleware validates the cookie. If the route requires admin privileges, `verifyAdmin` middleware further checks the user's role.
 
 ---
 
@@ -98,20 +94,28 @@ User → Register (/api/register)
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
 | `POST` | `/api/register` | ❌ | Register new user |
-| `POST` | `/api/login` | ❌ | Login & get JWT token |
+| `POST` | `/api/login` | ❌ | Login & set HTTP-Only cookie |
+| `POST` | `/api/logout` | ✅ | Clear HTTP-Only cookie |
+| `GET`  | `/api/me` | ✅ | Get current user session & role |
 
 ### Dashboard
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| `GET` | `/api/dashboard` | ✅ | Get dashboard + user data |
+| `GET` | `/api/dashboard` | ✅ | Get stats and 5 recent reports |
 
-### Reports
+### Reports (User)
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
 | `POST` | `/api/reports` | ✅ | Create a new report |
-| `GET` | `/api/reports/my` | ✅ | Get all reports by logged-in user |
-| `GET` | `/api/reports/my/:id` | ✅ | Get a specific report by ID |
-| `GET` | `/api/profile` | ✅ | Get logged-in user profile |
+| `GET` | `/api/reports` | ✅ | Get paginated reports for logged-in user |
+| `PUT` | `/api/reports/:id` | ✅ | Update an existing report |
+| `DELETE` | `/api/reports/:id` | ✅ | Delete a report |
+
+### Reports (Admin)
+| Method | Endpoint | Auth (Role) | Description |
+|---|---|---|---|
+| `GET` | `/api/admin/reports` | ✅ (ADMIN) | Get all reports across the system |
+| `PATCH`| `/api/admin/reports/:id/status`| ✅ (ADMIN) | Approve/Reject report with reason |
 
 ---
 
@@ -124,8 +128,7 @@ User → Register (/api/register)
 | `email` | String (unique) | User email |
 | `name` | String | Display name |
 | `password` | String | Hashed password |
-| `createdAt` | DateTime | Creation timestamp |
-| `updatedAt` | DateTime | Last update timestamp |
+| `role` | Enum (`Role`) | `USER` \| `ADMIN` |
 
 ### Report
 | Field | Type | Description |
@@ -133,9 +136,10 @@ User → Register (/api/register)
 | `id` | String (cuid) | Primary key |
 | `title` | String | Report title |
 | `description` | String | Report detail |
-| `status` | Enum | `PENDING` \| `APPROVED` \| `REJECTED` |
-| `category` | Enum | `BUG` \| `FEATURE` \| `COMPLAINT` \| `MAINTENANCE` |
-| `userId` | String | Foreign key to User |
+| `status` | Enum (`Status`)| `PENDING` \| `APPROVED` \| `REJECTED` |
+| `category` | Enum (`Category`)| `BUG` \| `FEATURE` \| `COMPLAINT` \| `MAINTENANCE` |
+| `rejectReason` | String? | Optional reason if rejected |
+| `userId` | String | Foreign key to `User` |
 
 ---
 
@@ -144,7 +148,7 @@ User → Register (/api/register)
 ### Prerequisites
 - Node.js >= 18
 - npm
-- PostgreSQL database (or [Neon](https://neon.tech) serverless PostgreSQL)
+- PostgreSQL database (Local or Cloud like Neon/Supabase)
 
 ### 1. Clone the repository
 
@@ -161,7 +165,6 @@ npm install
 ```
 
 Create a `.env` file in `apps/api/`:
-
 ```env
 DATABASE_URL="your_postgresql_connection_string"
 JWT_SECRET="your_jwt_secret_key"
@@ -170,22 +173,19 @@ PORT=3000
 NODE_ENV="development"
 ```
 
-Run database migration:
-
+Run database migrations to sync the schema:
 ```bash
 npx prisma migrate dev
 ```
 
-Start the backend:
-
+Start the backend server (uses `ts-node-dev` for hot-reloading):
 ```bash
 npm run dev
 ```
 
-Backend will run on → `http://localhost:3000`
-
 ### 3. Setup Frontend
 
+Open a new terminal window:
 ```bash
 cd apps/web
 npm install
@@ -193,37 +193,7 @@ npm run dev
 ```
 
 Frontend will run on → `http://localhost:5173`
-
----
-
-## 🧪 Testing Auth Flow
-
-```bash
-# Register
-curl -X POST http://localhost:3000/api/register \
-  -H "Content-Type: application/json" \
-  -d '{"name":"John Doe","email":"john@example.com","password":"Password123!"}'
-
-# Login
-curl -X POST http://localhost:3000/api/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"john@example.com","password":"Password123!"}'
-
-# Access protected route (use token from login response)
-curl http://localhost:3000/api/ \
-  -H "Authorization: Bearer <YOUR_TOKEN>"
-```
-
----
-
-## 🌿 Branch Structure
-
-| Branch | Description |
-|---|---|
-| `master` | Production-ready code |
-| `dev` | Main development branch |
-| `feat/` | Used During Development (not all preserved) |
-
+Backend runs on → `http://localhost:3000`
 
 ---
 
