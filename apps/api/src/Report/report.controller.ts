@@ -269,6 +269,11 @@ export const adminReportList = async (req: Request, res: Response) => {
         skip,
         take: limit,
         orderBy: { createdAt: "desc" },
+        include: {
+          user: {
+            select: { name: true, email: true },
+          },
+        },
       }),
       prisma.report.count({ where }),
     ]);

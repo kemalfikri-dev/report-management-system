@@ -1,12 +1,13 @@
 import { AuthContext } from "@/context/AuthContext";
+import { AppLayout } from "@/components/AppLayout";
 import { useContext } from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 export function ProtectedAdminRoute() {
   const { user, isLoading } = useContext(AuthContext) as UserProps;
 
   if (isLoading === true) {
-    return <div>Loading...</div>;
+    return <div className="flex items-center justify-center min-h-screen text-muted-foreground">Loading...</div>;
   }
 
   if (user === null) {
@@ -17,5 +18,6 @@ export function ProtectedAdminRoute() {
     return <Navigate to="/" replace />;
   }
 
-  return <Outlet />;
+  return <AppLayout />;
 }
+

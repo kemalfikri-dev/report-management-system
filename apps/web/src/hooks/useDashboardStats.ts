@@ -9,8 +9,17 @@ export interface DashboardStats {
   rejected: number;
 }
 
+export interface RecentReport {
+  id: string;
+  title: string;
+  status: string;
+  category: string;
+  createdAt: string;
+}
+
 export function useDashboardStats() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [recentReports, setRecentReports] = useState<RecentReport[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -24,6 +33,7 @@ export function useDashboardStats() {
         if (!cancelled) {
           setIsError(false);
           setStats(res.data?.stats || null);
+          setRecentReports(res.data?.recentReports || []);
         }
       })
       .catch((err) => {
@@ -50,5 +60,5 @@ export function useDashboardStats() {
     setRefreshKey((k) => k + 1);
   }, []);
 
-  return { stats, isLoading, isError, refetchStats };
+  return { stats, recentReports, isLoading, isError, refetchStats };
 }

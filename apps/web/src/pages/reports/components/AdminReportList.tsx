@@ -1,21 +1,13 @@
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import dayjs from "dayjs";
 import { DialogReport } from "./DialogReport";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { EditDialogReport } from "./EditDialogReport";
 import { ApproveButton } from "./ApproveButton";
 import { RejectDialog } from "./RejectDialog";
 import { useState, Fragment, useEffect } from "react";
 import { useAdminReport } from "../hooks/useAdminReport";
+import { ReportCard } from "./ReportCard";
+import { ReportFilters } from "./ReportFilters";
+import { FileSearch } from "lucide-react";
 
 export function AdminReportList() {
   const [page, setPage] = useState(1);
@@ -38,141 +30,91 @@ export function AdminReportList() {
   });
 
   return (
-    <div className="mx-auto max-w-3xl p-4 space-y-6">
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold">My Reports</h2>
-        </div>
-
-        <div className="flex gap-2 items-center">
-          <Select
-            value={categoryFilter}
-            onValueChange={(val) => {
-              setCategoryFilter(val);
-              setPage(1);
-            }}
-          >
-            <SelectTrigger id="checkout-category-ts6">
-              <SelectValue placeholder="Select Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="ALL">ALL</SelectItem>
-                <SelectItem value="MAINTENANCE">MAINTENANCE</SelectItem>
-                <SelectItem value="COMPLAINT">COMPLAINT</SelectItem>
-                <SelectItem value="BUG">BUG</SelectItem>
-                <SelectItem value="FEATURE">FEATURE</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-
-          <Select
-            value={statusFilter}
-            onValueChange={(val) => {
-              setStatusFilter(val);
-              setPage(1);
-            }}
-          >
-            <SelectTrigger id="checkout-category-ts7">
-              <SelectValue placeholder="Select Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="ALL">ALL</SelectItem>
-                <SelectItem value="PENDING">PENDING</SelectItem>
-                <SelectItem value="APPROVED">APPROVED</SelectItem>
-                <SelectItem value="REJECTED">REJECTED</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <Input
-          placeholder="Search Reports..."
-          className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-          value={searchFilter}
-          onChange={(event) => {
-            setSearchFilter(event.target.value);
-            setPage(1);
-          }}
-        />
-
-        {meta ? (
-          <p className="text-sm text-muted-foreground">
-            {meta.total} reports found (Page {meta.page} of {meta.totalPages || 1})
+    <div className="mx-auto max-w-5xl px-6 space-y-8 animate-in fade-in duration-500">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Semua Laporan</h1>
+          <p className="text-muted-foreground mt-1">
+            Pantau dan kelola seluruh laporan dari pengguna di sistem ini.
           </p>
-        ) : null}
+        </div>
       </div>
 
+      <ReportFilters
+        searchFilter={searchFilter}
+        setSearchFilter={setSearchFilter}
+        categoryFilter={categoryFilter}
+        setCategoryFilter={setCategoryFilter}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+        onFilterChange={() => setPage(1)}
+      />
+
+      {meta && meta.total > 0 && (
+        <div className="text-sm text-muted-foreground font-medium">
+          Menampilkan {allReports.length} dari {meta.total} laporan
+        </div>
+      )}
+
       {isLoading ? (
-        <div className="flex justify-center p-8">Loading reports...</div>
+        <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
+          Memuat laporan...
+        </div>
       ) : allReports.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 px-4 border-2 border-dashed rounded-xl bg-card/50 mt-4 text-center">
-          <h3 className="text-xl font-semibold mb-2">No reports found</h3>
+        <div className="flex flex-col items-center justify-center py-24 px-4 border-2 border-dashed rounded-xl bg-card/50 text-center">
+          <div className="bg-muted p-4 rounded-full mb-4">
+            <FileSearch className="h-8 w-8 text-muted-foreground" />
+          </div>
+          <h3 className="text-xl font-semibold mb-2">Tidak ada laporan</h3>
           <p className="text-muted-foreground max-w-md mb-8">
-            No reports match your current filters.
+            Belum ada laporan yang sesuai dengan filter pencarian saat ini.
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
-          {allReports.map((report) => (
-            <div
-              key={report.id}
-              className="border rounded-lg p-4 space-y-3 bg-card shadow-sm"
-            >
-              <h3 className="font-semibold text-lg truncate">{report.title}</h3>
-
-              <div className="flex gap-2">
-                <Badge variant="secondary">{report.category}</Badge>
-                <Badge variant="default">{report.status}</Badge>
-              </div>
-
-              <div className="flex justify-between items-center pt-2">
-                <p className="text-sm text-muted-foreground">
-                  {dayjs(report.createdAt).format("DD MMMM YYYY, HH:mm")}
-                </p>
-                <div className="flex gap-2">
-                  <EditDialogReport
-                    refetch={adminRefetch}
-                    selectedReport={report}
-                  />
-                  <DialogReport selectedReport={report} />
-                  {report.status === "PENDING" && (
-                    <Fragment>
-                      <ApproveButton
-                        selectedReport={report}
-                        refetch={adminRefetch}
-                      />
-                      <RejectDialog
-                        selectedReport={report}
-                        refetch={adminRefetch}
-                      />
-                    </Fragment>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
+        <div className="space-y-6">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {allReports.map((report) => (
+              <ReportCard
+                key={report.id}
+                report={report}
+                actions={
+                  <>
+                    <EditDialogReport refetch={adminRefetch} selectedReport={report} />
+                    <DialogReport selectedReport={report} />
+                    {report.status === "PENDING" && (
+                      <Fragment>
+                        <ApproveButton selectedReport={report} refetch={adminRefetch} />
+                        <RejectDialog selectedReport={report} refetch={adminRefetch} />
+                      </Fragment>
+                    )}
+                  </>
+                }
+              />
+            ))}
+          </div>
 
           {/* Pagination Controls */}
           {meta && meta.totalPages > 1 && (
-            <div className="flex justify-center gap-4 items-center pt-4">
+            <div className="flex justify-center items-center gap-4 pt-6 pb-12">
               <Button
                 variant="outline"
+                size="sm"
                 disabled={page === 1}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
               >
-                Previous
+                Sebelumnya
               </Button>
-              <span className="text-sm font-medium">
-                Page {page} of {meta.totalPages}
+              <span className="text-sm font-medium text-muted-foreground">
+                Halaman {page} dari {meta.totalPages}
               </span>
               <Button
                 variant="outline"
+                size="sm"
                 disabled={page >= meta.totalPages}
                 onClick={() => setPage((p) => p + 1)}
               >
-                Next
+                Selanjutnya
               </Button>
             </div>
           )}
