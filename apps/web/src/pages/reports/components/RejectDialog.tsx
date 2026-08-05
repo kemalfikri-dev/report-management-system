@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import apiClient, { isAxiosError } from "@/lib/axios";
 import { toast } from "sonner";
-import { ApiErrorResponse } from "@/types/auth";
+import type { ApiErrorResponse } from "@/types/auth";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
